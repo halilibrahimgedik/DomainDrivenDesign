@@ -12,7 +12,7 @@ namespace ContactApplicationService {
         return ContactService::getContactList();
     }
 
-    Contact inline getContactById(bsoncxx::oid& id) {
+    optional<Contact> inline getContactById(bsoncxx::oid& id) {
         return ContactService::getContactById(id);
     }
 

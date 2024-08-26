@@ -74,10 +74,9 @@ namespace ContactFactory {
             contact.address = doc["address"].get_value().get_string().value;
 
             return contact;
-        } else {
-            std::cout << "No contact found with _id " << id.to_string() << "." << std::endl;
-            return nullopt;
         }
+
+        return nullopt;
     }
 
 };

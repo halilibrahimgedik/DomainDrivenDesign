@@ -16,7 +16,7 @@ namespace ContactService {
         return ContactRepository::getContactList();
     }
 
-    Contact inline getContactById(bsoncxx::oid& id) {
+    optional<Contact> inline getContactById(bsoncxx::oid& id) {
         return ContactRepository::getContactById(id);
     }
 

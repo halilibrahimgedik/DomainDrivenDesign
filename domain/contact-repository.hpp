@@ -26,26 +26,24 @@ namespace ContactRepository {
         return contactList;
     }
 
-    Contact inline getContactById(bsoncxx::oid& id) {
+    optional<Contact> inline getContactById(bsoncxx::oid& id) {
         const auto database = MongoDBConnection::getDatabase("ContactDb");
         auto collection = database["Contacts"];
 
         auto contact = ContactFactory::getContactById(id, collection);
 
-        return contact.value();
+        if (contact) {
+            return contact.value();
+        }
+
+        return nullopt;
     }
 
     void inline deleteContact(const Document& document) {
         const auto database = MongoDBConnection::getDatabase("ContactDb");
         auto collection = database["Contacts"];
 
-        const auto result = collection.delete_one(document.view());
-
-        if (result && result->deleted_count() > 0) {
-            std::cout << "Contact has been deleted." << std::endl;
-        } else {
-            std::cout << "No contact found with specified id "<< std::endl;
-        }
+        collection.delete_one(document.view());
     }
 
     void inline updateContact(Contact& contact, const bsoncxx::oid id) {
