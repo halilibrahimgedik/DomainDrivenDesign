@@ -10,45 +10,40 @@ using namespace std;
 namespace ContactRepository {
     using Document = bsoncxx::builder::basic::document;
 
-    void inline addContact(const Document& document) {
+    mongocxx::collection inline getContactCollection() {
         const auto database = MongoDBConnection::getDatabase("ContactDb");
-        auto collection = database["Contacts"];
+        return database["Contacts"];
+    }
 
+    void inline addContact(const Document& document) {
+        auto collection = getContactCollection();
         collection.insert_one(document.view());
     }
 
     vector<Contact> inline getContactList() {
-        const auto database = MongoDBConnection::getDatabase("ContactDb");
-        auto collection = database["Contacts"];
-
+        auto collection = getContactCollection();
         const auto contactList = ContactFactory::getContactList(collection);
 
         return contactList;
     }
 
     optional<Contact> inline getContactById(bsoncxx::oid& id) {
-        const auto database = MongoDBConnection::getDatabase("ContactDb");
-        auto collection = database["Contacts"];
-
+        auto collection = getContactCollection();
         auto contact = ContactFactory::getContactById(id, collection);
 
-        if (contact) {
+        if (contact)
             return contact.value();
-        }
 
         return nullopt;
     }
 
     void inline deleteContact(const Document& document) {
-        const auto database = MongoDBConnection::getDatabase("ContactDb");
-        auto collection = database["Contacts"];
-
+        auto collection = getContactCollection();
         collection.delete_one(document.view());
     }
 
     void inline updateContact(Contact& contact, const bsoncxx::oid id) {
-        const auto database = MongoDBConnection::getDatabase("ContactDb");
-        auto collection = database["Contacts"];
+        auto collection = getContactCollection();
 
         Document filter{};
         filter.append(kvp("_id", id));

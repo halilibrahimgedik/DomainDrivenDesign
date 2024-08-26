@@ -4,6 +4,8 @@
 #include "../domain/contact-service.hpp"
 namespace ContactApplicationService {
 
+
+
     void inline addContact(const Contact& contact) {
         ContactService::addContact(contact);
     }

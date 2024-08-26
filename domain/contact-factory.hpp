@@ -49,6 +49,8 @@ namespace ContactFactory {
         return doc;
     }
 
+    // Bunlar Gereksiz mi ?, Repository'de mi yapılmalı ?, çünkü nesne üretmiyoruz ?,
+    // Update için yazmadım
     Document inline deleteContactById(bsoncxx::oid &id) {
         bsoncxx::builder::basic::document filter{};
         filter.append(kvp("_id", id));
