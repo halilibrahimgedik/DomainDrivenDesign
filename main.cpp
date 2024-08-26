@@ -1,6 +1,7 @@
 #include <iostream>
-
+#include <vector>
 #include "application/contact-application-service.hpp"
+#include "domain/Contact/contact.hpp"
 
 using namespace std;
 
@@ -27,6 +28,7 @@ void printContact(const Contact& contact) {
     std::cout << contact.country << endl;
     std::cout << contact.address << endl;
 }
+
 int main() {
     // ---Contact Ekleme---
     /*const Contact contact{"Hakan","Zengin", "0543 455 15 23", "hakanzengin@gmal.com","İstanbul","Türkiye","test adres"};
@@ -50,11 +52,14 @@ int main() {
 
 
     // --- Contact Güncelleme ---
-    /*Contact updateContact{"Halil İbrahim", "Gedik", "0589 444 85 21", "gedikhalil@gmail.com", "İstanbul",
-                        "Türkiye", "qwer cad. / vadire sk. / no:87 / Çekmeköy - İstanbul"};
+    /*Contact updateContact{"Halil İbrahim", "Gedik", "0589 000 00 00", "gedik@gmail.com",
+                        "İstanbul","Türkiye", "qwer cad. / vadire sk. / no:87 / Ümraniye - Türkiye"};
 
     const bsoncxx::oid id{"66cc4e6dcd73abdf4f69c283"};
     ContactApplicationService::updateContact(updateContact, id);
     printContact(updateContact);*/
+
+    bsoncxx::oid id{"66cc4e6dcd73abdf4f69c283"};
+    ContactApplicationService::addCallHistoryByContactId(id);
 
 }

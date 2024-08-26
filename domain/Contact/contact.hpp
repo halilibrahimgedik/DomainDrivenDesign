@@ -1,13 +1,15 @@
 #ifndef CONTACT_HPP
 #define CONTACT_HPP
+
 using namespace std;
+
 class Contact {
 public:
     Contact() = default;
-    Contact(std::string name, string surname, string phoneNumber,
+    Contact(string name, string surname, string phoneNumber,
             string email, string city, string country,
             string address)
-        : name(move(name)), surname(move(surname)), phoneNumber(move(phoneNumber)), email(std::move(email)), city(std::move(city)),
+        : name(std::move(name)), surname(std::move(surname)), phoneNumber(std::move(phoneNumber)), email(std::move(email)), city(std::move(city)),
           country(std::move(country)), address(std::move(address)) {}
 
     std::string name;

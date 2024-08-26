@@ -10,25 +10,26 @@ using namespace std;
 namespace ContactRepository {
     using Document = bsoncxx::builder::basic::document;
 
-    mongocxx::collection inline getContactCollection() {
-        const auto database = MongoDBConnection::getDatabase("ContactDb");
-        return database["Contacts"];
-    }
-
     void inline addContact(const Document& document) {
-        auto collection = getContactCollection();
+        const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
+        auto collection = dbConnection.getCollection("ContactDb", "Contacts");
+
         collection.insert_one(document.view());
     }
 
     vector<Contact> inline getContactList() {
-        auto collection = getContactCollection();
+        const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
+        auto collection = dbConnection.getCollection("ContactDb", "Contacts");
+
         const auto contactList = ContactFactory::getContactList(collection);
 
         return contactList;
     }
 
     optional<Contact> inline getContactById(bsoncxx::oid& id) {
-        auto collection = getContactCollection();
+        const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
+        auto collection = dbConnection.getCollection("ContactDb", "Contacts");
+
         auto contact = ContactFactory::getContactById(id, collection);
 
         if (contact)
@@ -38,12 +39,15 @@ namespace ContactRepository {
     }
 
     void inline deleteContact(const Document& document) {
-        auto collection = getContactCollection();
+        const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
+        auto collection = dbConnection.getCollection("ContactDb", "Contacts");
+
         collection.delete_one(document.view());
     }
 
     void inline updateContact(Contact& contact, const bsoncxx::oid id) {
-        auto collection = getContactCollection();
+        const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
+        auto collection = dbConnection.getCollection("ContactDb", "Contacts");
 
         Document filter{};
         filter.append(kvp("_id", id));

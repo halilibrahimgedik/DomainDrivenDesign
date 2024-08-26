@@ -35,7 +35,7 @@ namespace ContactFactory {
     }
 
     Document inline addContact(const Contact &contact) {
-        bsoncxx::builder::basic::document doc{};
+        Document doc{};
         doc.append(
             kvp("name", contact.name),
             kvp("surname", contact.surname),
@@ -52,14 +52,14 @@ namespace ContactFactory {
     // Bunlar Gereksiz mi ?, Repository'de mi yapılmalı ?, çünkü nesne üretmiyoruz ?,
     // Update için yazmadım
     Document inline deleteContactById(bsoncxx::oid &id) {
-        bsoncxx::builder::basic::document filter{};
+        Document filter{};
         filter.append(kvp("_id", id));
 
         return filter;
     }
 
     std::optional<Contact> inline getContactById(bsoncxx::oid& id, mongocxx::collection& collection) {
-        bsoncxx::builder::basic::document document{};
+        Document document{};
         document.append(kvp("_id", id));
 
         const auto result = collection.find_one(document.view());
