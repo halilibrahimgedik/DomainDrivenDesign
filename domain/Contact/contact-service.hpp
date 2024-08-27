@@ -28,6 +28,16 @@ namespace ContactService {
     void inline updateContact(Contact& contact, const bsoncxx::oid& id) {
         ContactRepository::updateContact(contact, id);
     }
+
+    optional<Contact> inline getContactByPhoneNumber(const string& phoneNumber) {
+        auto result = ContactRepository::getContactByPhoneNumber(phoneNumber);
+
+        if(result.has_value()) {
+            return result.value();
+        }
+
+        return nullopt;
+    }
 };
 
 #endif //CONTACT_SERVICE_HPP

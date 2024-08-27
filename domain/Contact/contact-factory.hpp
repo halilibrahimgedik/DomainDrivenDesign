@@ -21,6 +21,7 @@ namespace ContactFactory {
 
         for (auto&& doc: cursor) {
             Contact contact;
+            contact.id = doc["_id"].get_oid().value;
             contact.name = doc["name"].get_string().value;
             contact.surname = doc["surname"].get_string().value;
             contact.phoneNumber = doc["phoneNumber"].get_string().value;
@@ -67,6 +68,31 @@ namespace ContactFactory {
         if (result) {
             const auto& doc = *result;
             Contact contact;
+            contact.id = doc["_id"].get_oid().value;
+            contact.name = doc["name"].get_value().get_string().value;
+            contact.surname = doc["surname"].get_value().get_string().value;
+            contact.phoneNumber = doc["phoneNumber"].get_string().value;
+            contact.email = doc["email"].get_value().get_string().value;
+            contact.city = doc["city"].get_value().get_string().value;
+            contact.country = doc["country"].get_value().get_string().value;
+            contact.address = doc["address"].get_value().get_string().value;
+
+            return contact;
+        }
+
+        return nullopt;
+    }
+
+    std::optional<Contact> inline getContactByPhoneNumber(const string& phoneNumber, mongocxx::collection& collection) {
+        Document document{};
+        document.append(kvp("phoneNumber", phoneNumber));
+
+        const auto result = collection.find_one(document.view());
+
+        if (result) {
+            const auto& doc = *result;
+            Contact contact;
+            contact.id = doc["_id"].get_oid().value;
             contact.name = doc["name"].get_value().get_string().value;
             contact.surname = doc["surname"].get_value().get_string().value;
             contact.phoneNumber = doc["phoneNumber"].get_string().value;

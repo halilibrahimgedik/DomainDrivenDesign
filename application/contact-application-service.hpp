@@ -28,7 +28,6 @@ namespace ContactApplicationService {
     }
 
 
-
     inline string getTime() {
         // 1. Şu anki zamanı al
         const auto now = std::chrono::system_clock::now();
@@ -43,22 +42,24 @@ namespace ContactApplicationService {
         return ss.str();
     }
 
-    void inline addCallHistoryByContactId(bsoncxx::oid& id) {
-        const optional<Contact> contact = ContactService::getContactById(id);
-
-        if(!contact)
-            return;
+    void inline makeCall(const string& callerNumber, const string& dialedNumber) {
+        const auto optionalContact = ContactService::getContactByPhoneNumber(callerNumber);
+        const auto& contact = optionalContact.value();
 
         History history;
-        history.callerId = id;
-        history.callerName = contact.value().name;
-        history.callerSurname = contact.value().surname;
-        history.callerPhoneNumber = contact.value().phoneNumber;
+        history.callerId = contact.id.to_string();
+        history.callerName = contact.name;
+        history.callerSurname = contact.surname;
+        history.callerPhoneNumber = contact.phoneNumber;
+        history.dialedNumber = dialedNumber;
         history.date = getTime();
 
         HistoryService::addCallHistory(history);
     }
 
+    vector<History> inline getCallHistoryByPhoneNumber(const string& phoneNumber) {
+        return HistoryService::getCallHistoryByPhoneNumber(phoneNumber);
+    }
 
 };
 

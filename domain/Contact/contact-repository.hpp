@@ -67,6 +67,15 @@ namespace ContactRepository {
         collection.update_one(filter.view(), update.view());
     }
 
+    optional<Contact> inline getContactByPhoneNumber(const string& phoneNumber) {
+        const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
+        auto collection = dbConnection.getCollection("ContactDb", "Contacts");
+
+        auto result = ContactFactory::getContactByPhoneNumber(phoneNumber, collection);
+
+        return result;
+    }
+
 };
 
 #endif //CONTACT_REPOSITORY_HPP

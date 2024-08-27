@@ -14,6 +14,10 @@ namespace HistoryService {
         const Document document = HistoryFactory::addCallHistory(history);
         HistoryRepository::addCallHistory(document);
     }
+
+    vector<History> inline getCallHistoryByPhoneNumber(const string& phoneNumber) {
+        return HistoryRepository::getCallHistoryListByPhoneNumber(phoneNumber);
+    }
 }
 
 #endif //HISTORY_SERVICE_HPP

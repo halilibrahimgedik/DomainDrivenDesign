@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void printContacts(const vector<Contact> &contacts) {
+void printContacts(const vector<Contact>& contacts) {
     for(const auto& contact : contacts) {
         std::cout << endl;
         std::cout << contact.name << endl;
@@ -17,7 +17,6 @@ void printContacts(const vector<Contact> &contacts) {
         std::cout << contact.address << endl;
     }
 }
-
 void printContact(const Contact& contact) {
     std::cout << endl;
     std::cout << contact.name << endl;
@@ -28,6 +27,17 @@ void printContact(const Contact& contact) {
     std::cout << contact.country << endl;
     std::cout << contact.address << endl;
 }
+void printCallHistory(const vector<History>& callHistory) {
+    for(const auto& history : callHistory) {
+        cout << endl;
+        cout << "name: " << history.callerName << endl;
+        cout << "surname: " << history.callerSurname << endl;
+        cout << "phone number: " << history.callerPhoneNumber << endl;
+        cout << "date: " << history.date << endl;
+        cout << "caller id" << history.callerId << endl;
+        cout << "dialed number: " << history.dialedNumber << endl;
+    }
+}
 
 int main() {
     // ---Contact Ekleme---
@@ -36,8 +46,7 @@ int main() {
 
 
     // ---Contact Listesini getirme---
-    printContacts(ContactApplicationService::getContactList());
-    cout << "\n----------------------------------------------------" << endl;
+    /*printContacts(ContactApplicationService::getContactList());*/
 
 
     // ---Contact Silme---
@@ -52,14 +61,14 @@ int main() {
 
 
     // --- Contact Güncelleme ---
-    /*Contact updateContact{"Halil İbrahim", "Gedik", "0589 000 00 00", "gedik@gmail.com",
-                        "İstanbul","Türkiye", "qwer cad. / vadire sk. / no:87 / Ümraniye - Türkiye"};
-
+    /*Contact updateContact{"Halil İbrahim", "Gedik", "0589 000 00 00", "gedik@gmail.com","İstanbul","Türkiye", "qwer cad. / vadire sk. / no:87 / Ümraniye - Türkiye"};
     const bsoncxx::oid id{"66cc4e6dcd73abdf4f69c283"};
     ContactApplicationService::updateContact(updateContact, id);
     printContact(updateContact);*/
 
-    bsoncxx::oid id{"66cc4e6dcd73abdf4f69c283"};
-    ContactApplicationService::addCallHistoryByContactId(id);
+    // --- Arama Yapma ---
+    /*ContactApplicationService::makeCall("0589 000 00 00", "0542 459 85 36");*/
 
+    // --- Arama Geçmişi Listeleme ---
+    printCallHistory(ContactApplicationService::getCallHistoryByPhoneNumber("0589 000 00 00"));
 }
