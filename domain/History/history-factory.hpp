@@ -27,14 +27,9 @@ namespace HistoryFactory {
         return filter;
     }
 
-    vector<History> inline getCallHistoryList(mongocxx::collection& collection, const string& phoneNumber) {
-        bsoncxx::builder::basic::document filterBy_phoneNumber{};
-        filterBy_phoneNumber.append(kvp("callerPhoneNumber", phoneNumber));
-
-        auto cursor = collection.find({filterBy_phoneNumber.view()});
-
+    vector<History> inline getCallHistoryList(mongocxx::cursor& cursor) {
         vector<History> historyList{};
-        for(auto&& document : cursor) {
+        for(auto& document : cursor) {
             History history;
             history.dialedId = document["_id"].get_oid().value.to_string();
             history.dialedName = document["dialedName"].get_string().value;

@@ -15,7 +15,7 @@ namespace ContactApplicationService {
         return ContactService::getContactList();
     }
 
-    optional<Contact> inline getContactById(bsoncxx::oid& id) {
+    Contact inline getContactById(bsoncxx::oid& id) {
         return ContactService::getContactById(id);
     }
 
@@ -43,8 +43,7 @@ namespace ContactApplicationService {
     }
 
     void inline makeCall(const string& callerNumber, const string& dialedNumber) {
-        const auto optionalContact = ContactService::getContactByPhoneNumber(dialedNumber);
-        const auto& contact = optionalContact.value();
+        const auto contact = ContactService::getContactByPhoneNumber(dialedNumber);
 
         History history;
         history.dialedId = contact.id.to_string();

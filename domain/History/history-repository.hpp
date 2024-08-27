@@ -22,7 +22,20 @@ namespace HistoryRepository {
         const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
         auto collection = dbConnection.getCollection("ContactDb","Call Histories");
 
-        return  HistoryFactory::getCallHistoryList(collection, phoneNumber);
+        bsoncxx::builder::basic::document filterBy_phoneNumber{};
+
+        filterBy_phoneNumber.append(
+       kvp("$or",
+           make_array(
+               make_document(kvp("callerPhoneNumber", phoneNumber)),
+               make_document(kvp("dialedPhoneNumber", phoneNumber))
+           )
+       )
+   );
+
+        auto cursor = collection.find(filterBy_phoneNumber.view());
+
+        return  HistoryFactory::getCallHistoryList(cursor);
     }
 
     void inline deleteCallHistoryById(const bsoncxx::oid& id) {

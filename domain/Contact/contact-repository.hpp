@@ -21,28 +21,34 @@ namespace ContactRepository {
         const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
         auto collection = dbConnection.getCollection("ContactDb", "Contacts");
 
-        const auto contactList = ContactFactory::getContactList(collection);
+        auto cursor = collection.find({});
+        const auto contactList = ContactFactory::getContactList(cursor);
 
         return contactList;
     }
 
-    optional<Contact> inline getContactById(bsoncxx::oid& id) {
+    Contact inline getContactById(bsoncxx::oid& id) {
         const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
         auto collection = dbConnection.getCollection("ContactDb", "Contacts");
 
-        auto contact = ContactFactory::getContactById(id, collection);
+        Document document{};
+        document.append(kvp("_id", id));
 
-        if (contact)
-            return contact.value();
+        const auto result = collection.find_one(document.view());
 
-        return nullopt;
+        auto contact = ContactFactory::getContactById(result.value());
+
+        return contact;
     }
 
-    void inline deleteContact(const Document& document) {
+    void inline deleteContact(bsoncxx::oid& id) {
         const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
         auto collection = dbConnection.getCollection("ContactDb", "Contacts");
 
-        collection.delete_one(document.view());
+        Document filter{};
+        filter.append(kvp("_id", id));
+
+        collection.delete_one(filter.view());
     }
 
     void inline updateContact(Contact& contact, const bsoncxx::oid id) {
@@ -67,13 +73,18 @@ namespace ContactRepository {
         collection.update_one(filter.view(), update.view());
     }
 
-    optional<Contact> inline getContactByPhoneNumber(const string& phoneNumber) {
+    Contact inline getContactByPhoneNumber(const string& phoneNumber) {
         const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
         auto collection = dbConnection.getCollection("ContactDb", "Contacts");
 
-        auto result = ContactFactory::getContactByPhoneNumber(phoneNumber, collection);
+        Document document{};
+        document.append(kvp("phoneNumber", phoneNumber));
 
-        return result;
+        const auto result = collection.find_one(document.view());
+
+        auto contact = ContactFactory::getContactByPhoneNumber(result.value());
+
+        return contact.value();
     }
 
 };

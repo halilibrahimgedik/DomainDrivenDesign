@@ -16,27 +16,20 @@ namespace ContactService {
         return ContactRepository::getContactList();
     }
 
-    optional<Contact> inline getContactById(bsoncxx::oid& id) {
+    Contact inline getContactById(bsoncxx::oid& id) {
         return ContactRepository::getContactById(id);
     }
 
     void inline removeContactById(bsoncxx::oid& id) {
-        const Document document = ContactFactory::deleteContactById(id);
-        ContactRepository::deleteContact(document);
+        ContactRepository::deleteContact(id);
     }
 
     void inline updateContact(Contact& contact, const bsoncxx::oid& id) {
         ContactRepository::updateContact(contact, id);
     }
 
-    optional<Contact> inline getContactByPhoneNumber(const string& phoneNumber) {
-        auto result = ContactRepository::getContactByPhoneNumber(phoneNumber);
-
-        if(result.has_value()) {
-            return result.value();
-        }
-
-        return nullopt;
+    Contact inline getContactByPhoneNumber(const string& phoneNumber) {
+        return ContactRepository::getContactByPhoneNumber(phoneNumber);
     }
 };
 

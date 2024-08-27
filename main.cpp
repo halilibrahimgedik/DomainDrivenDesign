@@ -44,7 +44,7 @@ int main() {
 
 
     // ---Contact Listesini getirme---
-    /*printContacts(ContactApplicationService::getContactList());*/
+    // printContacts(ContactApplicationService::getContactList());
 
 
     // ---Contact Silme---
@@ -64,15 +64,18 @@ int main() {
     ContactApplicationService::updateContact(updateContact, id);
     printContact(updateContact);*/
 
+
     // --- Arama Yapma ---
-    /*ContactApplicationService::makeCall("0589 000 00 00", "0542 459 85 36");*/
+    // ContactApplicationService::makeCall("0542 459 85 36", "0589 000 00 00");
+
 
     // --- Arama Geçmişi Listeleme ---
-    /*printCallHistory(ContactApplicationService::getCallHistoryByPhoneNumber("0589 000 00 00"));*/
+    printCallHistory(ContactApplicationService::getCallHistoryByPhoneNumber("0589 000 00 00"));
+
 
     // --- Arama Geçmişi Silme ---
-    const bsoncxx::oid id{"66cd8e70401b05a5f905c992"};
+    /*const bsoncxx::oid id{"66cd8e70401b05a5f905c992"};
     ContactApplicationService::deleteCallHistoryById(id);
-    printCallHistory(ContactApplicationService::getCallHistoryByPhoneNumber("0589 000 00 00"));
+    printCallHistory(ContactApplicationService::getCallHistoryByPhoneNumber("0589 000 00 00"));*/
 
 }

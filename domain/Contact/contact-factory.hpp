@@ -14,12 +14,10 @@ using bsoncxx::builder::basic::make_document;
 namespace ContactFactory {
     using Document = bsoncxx::builder::basic::document;
 
-    std::vector<Contact> inline getContactList(mongocxx::collection &collection) {
-        auto cursor = collection.find({});
-
+    std::vector<Contact> inline getContactList(mongocxx::cursor& cursor) {
         vector<Contact> contactList;
 
-        for (auto&& doc: cursor) {
+        for (auto& doc: cursor) {
             Contact contact;
             contact.id = doc["_id"].get_oid().value;
             contact.name = doc["name"].get_string().value;
@@ -50,23 +48,22 @@ namespace ContactFactory {
         return doc;
     }
 
-    // Bunlar Gereksiz mi ?, Repository'de mi yapılmalı ?, çünkü nesne üretmiyoruz ?,
-    // Update için yazmadım
-    Document inline deleteContactById(bsoncxx::oid &id) {
-        Document filter{};
-        filter.append(kvp("_id", id));
+    Contact inline getContactById(const bsoncxx::document::value& document) {
+            Contact contact;
+            contact.id = document["_id"].get_oid().value;
+            contact.name = document["name"].get_value().get_string().value;
+            contact.surname = document["surname"].get_value().get_string().value;
+            contact.phoneNumber = document["phoneNumber"].get_string().value;
+            contact.email = document["email"].get_value().get_string().value;
+            contact.city = document["city"].get_value().get_string().value;
+            contact.country = document["country"].get_value().get_string().value;
+            contact.address = document["address"].get_value().get_string().value;
 
-        return filter;
+        return contact;
     }
 
-    std::optional<Contact> inline getContactById(bsoncxx::oid& id, mongocxx::collection& collection) {
-        Document document{};
-        document.append(kvp("_id", id));
-
-        const auto result = collection.find_one(document.view());
-
-        if (result) {
-            const auto& doc = *result;
+    std::optional<Contact> inline getContactByPhoneNumber(const bsoncxx::document::value& docValue) {
+            const auto& doc = docValue;
             Contact contact;
             contact.id = doc["_id"].get_oid().value;
             contact.name = doc["name"].get_value().get_string().value;
@@ -78,33 +75,6 @@ namespace ContactFactory {
             contact.address = doc["address"].get_value().get_string().value;
 
             return contact;
-        }
-
-        return nullopt;
-    }
-
-    std::optional<Contact> inline getContactByPhoneNumber(const string& phoneNumber, mongocxx::collection& collection) {
-        Document document{};
-        document.append(kvp("phoneNumber", phoneNumber));
-
-        const auto result = collection.find_one(document.view());
-
-        if (result) {
-            const auto& doc = *result;
-            Contact contact;
-            contact.id = doc["_id"].get_oid().value;
-            contact.name = doc["name"].get_value().get_string().value;
-            contact.surname = doc["surname"].get_value().get_string().value;
-            contact.phoneNumber = doc["phoneNumber"].get_string().value;
-            contact.email = doc["email"].get_value().get_string().value;
-            contact.city = doc["city"].get_value().get_string().value;
-            contact.country = doc["country"].get_value().get_string().value;
-            contact.address = doc["address"].get_value().get_string().value;
-
-            return contact;
-        }
-
-        return nullopt;
     }
 
 };
