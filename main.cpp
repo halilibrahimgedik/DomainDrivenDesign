@@ -27,15 +27,13 @@ void printContact(const Contact& contact) {
     std::cout << contact.country << endl;
     std::cout << contact.address << endl;
 }
-void printCallHistory(const vector<History>& callHistory) {
+void printCallHistory(const vector<ListHistoryDto>& callHistory) {
     for(const auto& history : callHistory) {
         cout << endl;
         cout << "name: " << history.callerName << endl;
         cout << "surname: " << history.callerSurname << endl;
-        cout << "phone number: " << history.callerPhoneNumber << endl;
-        cout << "date: " << history.date << endl;
-        cout << "caller id" << history.callerId << endl;
         cout << "dialed number: " << history.dialedNumber << endl;
+        cout << "date: " << history.date << endl;
     }
 }
 
@@ -70,5 +68,11 @@ int main() {
     /*ContactApplicationService::makeCall("0589 000 00 00", "0542 459 85 36");*/
 
     // --- Arama Geçmişi Listeleme ---
+    /*printCallHistory(ContactApplicationService::getCallHistoryByPhoneNumber("0589 000 00 00"));*/
+
+    // --- Arama Geçmişi Silme ---
+    const bsoncxx::oid id{"66cd8e70401b05a5f905c992"};
+    ContactApplicationService::deleteCallHistoryById(id);
     printCallHistory(ContactApplicationService::getCallHistoryByPhoneNumber("0589 000 00 00"));
+
 }

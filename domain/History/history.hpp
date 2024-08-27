@@ -8,12 +8,12 @@ class History {
 public:
     History() = default;
     History(string& id, string& callerName, string& callerSurname, string& callerPhoneNumber, string dialedNumber, string& date):
-            callerId(move(id)), callerName(std::move(callerName)), callerSurname(std::move(callerSurname)),
+            dialedId(move(id)), dialedName(std::move(callerName)), dialedSurname(std::move(callerSurname)),
             callerPhoneNumber(std::move(callerPhoneNumber)), dialedNumber(move(dialedNumber)), date(std::move(date)) {}
 
-    string callerId;
-    string callerName;
-    string callerSurname;
+    string dialedId;
+    string dialedName;
+    string dialedSurname;
     string callerPhoneNumber;
     string dialedNumber;
     string date;

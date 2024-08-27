@@ -16,9 +16,9 @@ namespace HistoryFactory {
     Document inline addCallHistory(History& history) {
         Document filter{};
         filter.append(
-            kvp("callerId", history.callerId),
-            kvp("callerName", history.callerName),
-            kvp("callerSurname", history.callerSurname),
+            kvp("dialedId", history.dialedId),
+            kvp("dialedName", history.dialedName),
+            kvp("dialedSurname", history.dialedSurname),
             kvp("callerPhoneNumber", history.callerPhoneNumber),
             kvp("dialedPhoneNumber", history.dialedNumber),
             kvp("date", history.date)
@@ -33,12 +33,13 @@ namespace HistoryFactory {
 
         auto cursor = collection.find({filterBy_phoneNumber.view()});
 
-        vector<HistoryDto> historyList{};
+        vector<History> historyList{};
         for(auto&& document : cursor) {
             History history;
-            history.callerId = document["_id"].get_oid().value.to_string();
-            history.callerName = document["callerName"].get_string().value;
-            history.callerSurname = document["callerSurname"].get_string().value;
+            history.dialedId = document["_id"].get_oid().value.to_string();
+            history.dialedName = document["dialedName"].get_string().value;
+            history.dialedSurname = document["dialedSurname"].get_string().value;
+            history.dialedNumber = document["dialedPhoneNumber"].get_string().value;
             history.callerPhoneNumber = document["callerPhoneNumber"].get_string().value;
             history.date = document["date"].get_string().value;
             historyList.push_back(history);

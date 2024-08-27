@@ -43,22 +43,26 @@ namespace ContactApplicationService {
     }
 
     void inline makeCall(const string& callerNumber, const string& dialedNumber) {
-        const auto optionalContact = ContactService::getContactByPhoneNumber(callerNumber);
+        const auto optionalContact = ContactService::getContactByPhoneNumber(dialedNumber);
         const auto& contact = optionalContact.value();
 
         History history;
-        history.callerId = contact.id.to_string();
-        history.callerName = contact.name;
-        history.callerSurname = contact.surname;
-        history.callerPhoneNumber = contact.phoneNumber;
-        history.dialedNumber = dialedNumber;
+        history.dialedId = contact.id.to_string();
+        history.dialedName = contact.name;
+        history.dialedSurname = contact.surname;
+        history.dialedNumber = contact.phoneNumber;
+        history.callerPhoneNumber = callerNumber;
         history.date = getTime();
 
         HistoryService::addCallHistory(history);
     }
 
-    vector<History> inline getCallHistoryByPhoneNumber(const string& phoneNumber) {
+    vector<ListHistoryDto> inline getCallHistoryByPhoneNumber(const string& phoneNumber) {
         return HistoryService::getCallHistoryByPhoneNumber(phoneNumber);
+    }
+
+    void inline deleteCallHistoryById(const bsoncxx::oid& id) {
+        HistoryService::deleteCallHistoryById(id);
     }
 
 };

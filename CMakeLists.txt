@@ -15,7 +15,7 @@ add_executable(TestConnection main.cpp
         domain/History/history-repository.hpp
         domain/History/history-factory.hpp
         domain/History/history-service.hpp
-        domain/History/history-dto.hpp
+        domain/History/list-history-dto.hpp
 )
 
 target_link_libraries(TestConnection PRIVATE

@@ -25,6 +25,16 @@ namespace HistoryRepository {
         return  HistoryFactory::getCallHistoryList(collection, phoneNumber);
     }
 
+    void inline deleteCallHistoryById(const bsoncxx::oid& id) {
+        const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
+        auto collection = dbConnection.getCollection("ContactDb","Call Histories");
+
+        Document filter{};
+        filter.append(kvp("_id", id));
+
+        collection.delete_one(filter.view());
+    }
+
 }
 
 

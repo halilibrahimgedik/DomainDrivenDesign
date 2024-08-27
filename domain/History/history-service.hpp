@@ -3,6 +3,7 @@
 
 #include "history-factory.hpp"
 #include "history-repository.hpp"
+#include "list-history-dto.hpp"
 
 using namespace std;
 
@@ -15,8 +16,28 @@ namespace HistoryService {
         HistoryRepository::addCallHistory(document);
     }
 
-    vector<History> inline getCallHistoryByPhoneNumber(const string& phoneNumber) {
-        return HistoryRepository::getCallHistoryListByPhoneNumber(phoneNumber);
+    vector<ListHistoryDto> inline getCallHistoryByPhoneNumber(const string& phoneNumber) {
+        const auto result = HistoryRepository::getCallHistoryListByPhoneNumber(phoneNumber);
+
+        vector<ListHistoryDto> history_dtos;
+        if(!result.empty()) {
+            for (const auto& history : result) {
+                ListHistoryDto history_dto;
+
+                history_dto.callerName = history.dialedName;
+                history_dto.callerSurname = history.dialedSurname;
+                history_dto.dialedNumber = history.dialedNumber;
+                history_dto.date = history.date;
+
+                history_dtos.push_back(history_dto);
+            }
+        }
+
+        return history_dtos;
+    }
+
+    void inline deleteCallHistoryById(const bsoncxx::oid& id) {
+        HistoryRepository::deleteCallHistoryById(id);
     }
 }
 
