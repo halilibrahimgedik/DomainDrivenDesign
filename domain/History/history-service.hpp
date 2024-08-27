@@ -11,7 +11,7 @@ namespace HistoryService {
 
     using Document = bsoncxx::builder::basic::document;
 
-    void inline addCallHistory(History& history) {
+    void inline addCallHistory(const History& history) {
         const Document document = HistoryFactory::addCallHistory(history);
         HistoryRepository::addCallHistory(document);
     }

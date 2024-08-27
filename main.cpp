@@ -37,6 +37,13 @@ void printCallHistory(const vector<ListHistoryDto>& callHistory) {
     }
 }
 
+void makeCall(const string& callerPhoneNumber, const string& dialedPhoneNumber) {
+    Contact contact = ContactApplicationService::getContactByPhoneNumber(callerPhoneNumber); // dialed phone number
+    History history{contact.id.to_string(),contact.name,contact.surname,dialedPhoneNumber,
+                        contact.phoneNumber};
+    ContactApplicationService::makeCall(history);
+}
+
 int main() {
     // ---Contact Ekleme---
     /*const Contact contact{"Hakan","Zengin", "0543 455 15 23", "hakanzengin@gmal.com","İstanbul","Türkiye","test adres"};
@@ -66,11 +73,11 @@ int main() {
 
 
     // --- Arama Yapma ---
-    // ContactApplicationService::makeCall("0542 459 85 36", "0589 000 00 00");
+    makeCall("0533 333 33 33", "0542 222 22 22");
 
 
     // --- Arama Geçmişi Listeleme ---
-    printCallHistory(ContactApplicationService::getCallHistoryByPhoneNumber("0589 000 00 00"));
+    printCallHistory(ContactApplicationService::getCallHistoryByPhoneNumber("0533 333 33 33"));
 
 
     // --- Arama Geçmişi Silme ---

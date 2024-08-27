@@ -4,7 +4,7 @@
 
 #include "history-factory.hpp"
 #include "history.hpp"
-#include "../MongoDbConnection.hpp"
+#include "../../Infrastructure/mongodb-connection.hpp"
 
 using namespace std;
 

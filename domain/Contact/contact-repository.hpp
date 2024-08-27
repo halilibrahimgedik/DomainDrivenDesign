@@ -3,7 +3,7 @@
 
 #include "contact-factory.hpp"
 #include "contact.hpp"
-#include "../MongoDbConnection.hpp"
+#include "../../Infrastructure/mongodb-connection.hpp"
 
 using namespace std;
 

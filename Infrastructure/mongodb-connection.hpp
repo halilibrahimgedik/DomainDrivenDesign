@@ -1,10 +1,12 @@
+#ifndef MONGODB_CONNECTION_HPP
+#define MONGODB_CONNECTION_HPP
 
-#ifndef MONGODBCONNECTION_HPP
-#define MONGODBCONNECTION_HPP
 
 #include <mongocxx/client.hpp>
-#include <mongocxx/instance.hpp>
 #include <mongocxx/uri.hpp>
+#include <string>
+using namespace std;
+
 class MongoDBConnection {
 public:
     static MongoDBConnection& getInstance() {
@@ -16,7 +18,7 @@ public:
         return client;
     }
 
-    [[nodiscard]] mongocxx::database getDatabase(const std::string& dbName) const{
+    [[nodiscard]] mongocxx::database getDatabase(const string& dbName) const{
         return client.database(dbName);
     }
 
@@ -30,4 +32,4 @@ private:
     mongocxx::client client;
 };
 
-#endif //MONGODBCONNECTION_HPP
+#endif //MONGODB_CONNECTION_HPP

@@ -10,12 +10,12 @@ add_executable(TestConnection main.cpp
         domain/Contact/contact-repository.hpp
         domain/Contact/contact-factory.hpp
         application/contact-application-service.hpp
-        domain/MongoDbConnection.hpp
         domain/History/history.hpp
         domain/History/history-repository.hpp
         domain/History/history-factory.hpp
         domain/History/history-service.hpp
         domain/History/list-history-dto.hpp
+        Infrastructure/mongodb-connection.hpp
 )
 
 target_link_libraries(TestConnection PRIVATE

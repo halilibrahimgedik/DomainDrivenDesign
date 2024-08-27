@@ -27,32 +27,11 @@ namespace ContactApplicationService {
         ContactService::updateContact(contact, id);
     }
 
-
-    inline string getTime() {
-        // 1. Şu anki zamanı al
-        const auto now = std::chrono::system_clock::now();
-
-        // 2. Zamanı std::time_t türüne dönüştür
-        const auto time = std::chrono::system_clock::to_time_t(now);
-
-        // 3. Zamanı formatla
-        stringstream ss;
-        ss << std::put_time(std::localtime(&time), "%Y-%m-%d %H:%M:%S");
-
-        return ss.str();
+    Contact inline getContactByPhoneNumber(const string& phoneNumber) {
+        return ContactService::getContactByPhoneNumber(phoneNumber);
     }
 
-    void inline makeCall(const string& callerNumber, const string& dialedNumber) {
-        const auto contact = ContactService::getContactByPhoneNumber(dialedNumber);
-
-        History history;
-        history.dialedId = contact.id.to_string();
-        history.dialedName = contact.name;
-        history.dialedSurname = contact.surname;
-        history.dialedNumber = contact.phoneNumber;
-        history.callerPhoneNumber = callerNumber;
-        history.date = getTime();
-
+    void inline makeCall(const History& history) {
         HistoryService::addCallHistory(history);
     }
 
