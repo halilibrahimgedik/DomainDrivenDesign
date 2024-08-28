@@ -27,7 +27,7 @@ namespace ContactRepository {
         return contactList;
     }
 
-    Contact inline getContactById(bsoncxx::oid& id) {
+    Contact inline getContactById(const bsoncxx::oid& id) {
         const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
         auto collection = dbConnection.getCollection("ContactDb", "Contacts");
 
@@ -51,12 +51,12 @@ namespace ContactRepository {
         collection.delete_one(filter.view());
     }
 
-    void inline updateContact(Contact& contact, const bsoncxx::oid id) {
+    void inline updateContact(Contact& contact) {
         const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
         auto collection = dbConnection.getCollection("ContactDb", "Contacts");
 
         Document filter{};
-        filter.append(kvp("_id", id));
+        filter.append(kvp("_id", contact.id));
 
         Document update{};
         update.append(kvp("$set",
@@ -85,6 +85,18 @@ namespace ContactRepository {
         auto contact = ContactFactory::getContactByPhoneNumber(result.value());
 
         return contact.value();
+    }
+
+    bool inline any(const bsoncxx::oid& id) {
+        const MongoDBConnection& dbConnection = MongoDBConnection::getInstance();
+        auto collection = dbConnection.getCollection("ContactDb", "Contacts");
+
+        bsoncxx::builder::basic::document filter{};
+        filter.append(kvp("_id", id));
+
+        auto cursor = collection.find(filter.view());
+
+        return cursor.begin() != cursor.end();
     }
 
 };

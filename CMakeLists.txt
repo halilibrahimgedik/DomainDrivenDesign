@@ -3,6 +3,7 @@ project(TestConnection)
 
 set(CMAKE_CXX_STANDARD 20)
 find_package(mongocxx CONFIG REQUIRED)
+find_package(Crow CONFIG REQUIRED)
 
 add_executable(TestConnection main.cpp
         domain/Contact/contact.hpp
@@ -21,4 +22,5 @@ add_executable(TestConnection main.cpp
 target_link_libraries(TestConnection PRIVATE
         $<IF:$<TARGET_EXISTS:mongo::bsoncxx_static>,mongo::bsoncxx_static,mongo::bsoncxx_shared>
         $<IF:$<TARGET_EXISTS:mongo::mongocxx_static>,mongo::mongocxx_static,mongo::mongocxx_shared>
+        Crow::Crow
 )

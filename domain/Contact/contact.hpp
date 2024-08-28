@@ -6,11 +6,20 @@ using namespace std;
 class Contact {
 public:
     Contact() = default;
-    Contact(bsoncxx::oid& id, string name, string surname, string phoneNumber,
+
+    Contact(string name, string surname, string phoneNumber,
+            string email, string city, string country,
+            string address)
+        : name(std::move(name)), surname(std::move(surname)), phoneNumber(std::move(phoneNumber)),
+          email(std::move(email)), city(std::move(city)), country(std::move(country)), address(std::move(address)) {
+    }
+
+    Contact(const bsoncxx::oid id, string name, string surname, string phoneNumber,
             string email, string city, string country,
             string address)
         : id(id), name(std::move(name)), surname(std::move(surname)), phoneNumber(std::move(phoneNumber)),
-            email(std::move(email)), city(std::move(city)), country(std::move(country)), address(std::move(address)) {}
+          email(std::move(email)), city(std::move(city)), country(std::move(country)), address(std::move(address)) {
+    }
 
     bsoncxx::oid id;
     std::string name;

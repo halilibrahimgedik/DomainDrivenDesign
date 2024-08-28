@@ -15,7 +15,7 @@ namespace ContactApplicationService {
         return ContactService::getContactList();
     }
 
-    Contact inline getContactById(bsoncxx::oid& id) {
+    Contact inline getContactById(const bsoncxx::oid& id) {
         return ContactService::getContactById(id);
     }
 
@@ -23,12 +23,16 @@ namespace ContactApplicationService {
         ContactService::removeContactById(id);
     }
 
-    void inline updateContact(Contact& contact, const bsoncxx::oid& id) {
-        ContactService::updateContact(contact, id);
+    void inline updateContact(Contact& contact) {
+        ContactService::updateContact(contact);
     }
 
     Contact inline getContactByPhoneNumber(const string& phoneNumber) {
         return ContactService::getContactByPhoneNumber(phoneNumber);
+    }
+
+    bool inline any(const bsoncxx::oid& id) {
+        return ContactService::any(id);
     }
 
     void inline makeCall(const History& history) {

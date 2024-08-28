@@ -2,87 +2,187 @@
 #include <vector>
 #include "application/contact-application-service.hpp"
 #include "domain/Contact/contact.hpp"
+#include <crow.h>
+#include <string>
 
 using namespace std;
 
-void printContacts(const vector<Contact>& contacts) {
-    for(const auto& contact : contacts) {
-        std::cout << endl;
-        std::cout << contact.name << endl;
-        std::cout << contact.surname << endl;
-        std::cout << contact.phoneNumber << endl;
-        std::cout << contact.email << endl;
-        std::cout << contact.city << endl;
-        std::cout << contact.country << endl;
-        std::cout << contact.address << endl;
-    }
-}
-void printContact(const Contact& contact) {
-    std::cout << endl;
-    std::cout << contact.name << endl;
-    std::cout << contact.surname << endl;
-    std::cout << contact.phoneNumber << endl;
-    std::cout << contact.email << endl;
-    std::cout << contact.city << endl;
-    std::cout << contact.country << endl;
-    std::cout << contact.address << endl;
-}
-void printCallHistory(const vector<ListHistoryDto>& callHistory) {
-    for(const auto& history : callHistory) {
-        cout << endl;
-        cout << "name: " << history.callerName << endl;
-        cout << "surname: " << history.callerSurname << endl;
-        cout << "dialed number: " << history.dialedNumber << endl;
-        cout << "date: " << history.date << endl;
-    }
-}
-
-void makeCall(const string& callerPhoneNumber, const string& dialedPhoneNumber) {
-    Contact contact = ContactApplicationService::getContactByPhoneNumber(callerPhoneNumber); // dialed phone number
-    History history{contact.id.to_string(),contact.name,contact.surname,dialedPhoneNumber,
-                        contact.phoneNumber};
-    ContactApplicationService::makeCall(history);
-}
-
 int main() {
-    // ---Contact Ekleme---
-    /*const Contact contact{"Hakan","Zengin", "0543 455 15 23", "hakanzengin@gmal.com","İstanbul","Türkiye","test adres"};
-    ContactApplicationService::addContact(contact);*/
+    crow::SimpleApp app;
 
+    // --- Contact Ekleme ---
+    CROW_ROUTE(app, "/contacts").methods(crow::HTTPMethod::Post)([](const crow::request &req) {
+        const auto values = crow::json::load(req.body);
+        if (!values) {
+            return crow::response{400, "Bad Request !!!"};
+        }
 
-    // ---Contact Listesini getirme---
-    // printContacts(ContactApplicationService::getContactList());
+        if (!values.has("name") || !values.has("surname") || !values.has("phoneNumber") ||
+            !values.has("email") || !values.has("city") || !values.has("country") || !values.has("address")) {
+            return crow::response{400, "Bad Request !"};
+        }
 
+        if (values["name"] == "" || values["surname"] == "" || values["phoneNumber"] == "" || values["email"] == "" ||
+            values["city"] == "" || values["country"] == "" || values["address"] == "") {
+            return crow::response{400, "Bad Request !. Empty field error."};
+        }
+
+        const Contact newContact{
+            values["name"].s(), values["surname"].s(), values["phoneNumber"].s(),
+            values["email"].s(), values["city"].s(), values["country"].s(), values["address"].s()
+        };
+
+        ContactApplicationService::addContact(newContact);
+
+        return crow::response{201, "Created a contact"};
+    });
+
+    // --- Contact Listesi ---
+    CROW_ROUTE(app, "/contacts").methods(crow::HTTPMethod::Get)([]() {
+        std::vector<crow::json::wvalue> contactList;
+        crow::json::wvalue contactJson;
+
+        for (const auto &contact: ContactApplicationService::getContactList()) {
+            contactJson["id"] = contact.id.to_string();
+            contactJson["name"] = contact.name;
+            contactJson["surname"] = contact.surname;
+            contactJson["phoneNumber"] = contact.phoneNumber;
+            contactJson["email"] = contact.email;
+            contactJson["city"] = contact.city;
+            contactJson["country"] = contact.country;
+            contactJson["address"] = contact.address;
+
+            contactList.push_back(contactJson);
+        }
+        const auto response = crow::json::wvalue(contactList);
+
+        return response;
+    });
+
+    // --- id ile Contact Bilgisini Getirme ---
+    CROW_ROUTE(app, "/contacts/<string>").methods(crow::HTTPMethod::Get)([](const string &id) {
+        const bsoncxx::oid bsonId{id};
+
+        auto contact = ContactApplicationService::getContactById(bsonId);
+        crow::json::wvalue response;
+
+        response["id"] = contact.id.to_string();
+        response["name"] = contact.name;
+        response["surname"] = contact.surname;
+        response["phoneNumber"] = contact.phoneNumber;
+        response["email"] = contact.email;
+        response["city"] = contact.city;
+        response["country"] = contact.country;
+        response["address"] = contact.address;
+
+        return crow::response{200, response};
+    });
 
     // ---Contact Silme---
-    /*auto id = bsoncxx::oid{"66cc4e6dcd73abdf4f69c555"};
-    ContactApplicationService::removeContact(id);*/
+    CROW_ROUTE(app, "/contacts/<string>").methods(crow::HTTPMethod::Delete)([](const string &id) {
+        if (id.empty()) {
+            return crow::response{400, "Bad Request"};
+        }
 
+        bsoncxx::oid bsonId{id};
+        if (!ContactApplicationService::any(bsonId)) {
+            return crow::response{404, "Contact Not Found"};
+        }
 
-    // ---id'ye göre Contact bilgilerini getirme---
-    /*bsoncxx::oid contactId {"66cc4e6dcd73abdf4f69c283"};
-    const auto contact = ContactApplicationService::getContactById(contactId);
-    printContact(contact);*/
+        ContactApplicationService::removeContact(bsonId);
 
+        return crow::response{204, "Contact Deleted"};
+    });
 
     // --- Contact Güncelleme ---
-    /*Contact updateContact{"Halil İbrahim", "Gedik", "0589 000 00 00", "gedik@gmail.com","İstanbul","Türkiye", "qwer cad. / vadire sk. / no:87 / Ümraniye - Türkiye"};
-    const bsoncxx::oid id{"66cc4e6dcd73abdf4f69c283"};
-    ContactApplicationService::updateContact(updateContact, id);
-    printContact(updateContact);*/
+    CROW_ROUTE(app, "/contacts").methods(crow::HTTPMethod::Put)([](const crow::request &req) {
+        const auto contact = crow::json::load(req.body);
+        if (!contact) {
+            return crow::response{400, "Bad Request !"};
+        }
+
+        const string id = contact["id"].s();
+        const bsoncxx::oid bsonId{id};
+
+        Contact updatedContact{
+            bsonId, contact["name"].s(), contact["surname"].s(),
+            contact["phoneNumber"].s(), contact["email"].s(),
+            contact["city"].s(), contact["country"].s(), contact["address"].s()
+        };
+
+        ContactApplicationService::updateContact(updatedContact);
+
+        return crow::response{204, "User with id:" + bsonId.to_string() + "has been updated"};
+    });
 
 
     // --- Arama Yapma ---
-    makeCall("0533 333 33 33", "0542 222 22 22");
+    CROW_ROUTE(app, "/makecalls").methods(crow::HTTPMethod::Post)([](const crow::request &req) {
+        const auto values = crow::json::load(req.body);
+        if (!values) {
+            return crow::response{400, "Bad Request !"};
+        }
 
+        const string dialedNumber = values["dialedNumber"].s();
+        const string callerNumber = values["callerNumber"].s();
+        Contact contact = ContactApplicationService::getContactByPhoneNumber(dialedNumber);
+
+        History history{
+            contact.id.to_string(), contact.name, contact.surname, callerNumber,
+            contact.phoneNumber
+        };
+
+        ContactApplicationService::makeCall(history);
+
+        return crow::response(200, "calling" + contact.name + "(" + contact.phoneNumber + ")");
+    });
 
     // --- Arama Geçmişi Listeleme ---
-    printCallHistory(ContactApplicationService::getCallHistoryByPhoneNumber("0533 333 33 33"));
+    CROW_ROUTE(app, "/histories").methods(crow::HTTPMethod::Post)([](const crow::request &req) {
+        // Gelen POST isteğinden JSON verisini yükle
+        const auto value = crow::json::load(req.body);
 
+        // Eğer JSON verisi geçersizse, 400 Bad Request yanıtı döndür
+        if (!value) {
+            return crow::response{400, "Bad Request!"};
+        }
+
+        // JSON'dan telefon numarasını al
+        const std::string phoneNumber = value["phoneNumber"].s();
+        std::vector<crow::json::wvalue> historyList;
+
+        // Telefon numarasına göre çağrı geçmişini al ve JSON formatına dönüştür
+        for (const auto &history: ContactApplicationService::getCallHistoryByPhoneNumber(phoneNumber)) {
+            historyList.emplace_back(
+                crow::json::wvalue{
+                {"callerName", history.callerName},
+                {"callerSurname", history.callerSurname},
+                {"dialedNumber", history.dialedNumber},
+                {"date", history.date}
+            });
+        }
+
+        // Yanıt JSON'ını oluştur
+        crow::json::wvalue response;
+        response["CallHistory"] = std::move(historyList);
+
+        // Yanıtı döndür
+        return crow::response{response};
+    });
 
     // --- Arama Geçmişi Silme ---
-    /*const bsoncxx::oid id{"66cd8e70401b05a5f905c992"};
-    ContactApplicationService::deleteCallHistoryById(id);
-    printCallHistory(ContactApplicationService::getCallHistoryByPhoneNumber("0589 000 00 00"));*/
+    CROW_ROUTE(app, "/histories").methods(crow::HTTPMethod::Delete)([](const crow::request &req) {
+        const auto value = crow::json::load(req.body);
+        if (!value) {
+            return crow::response{400, "Bad Request !"};
+        }
+        const string id = value["id"].s();
+        const bsoncxx::oid bsonId{id};
 
+        ContactApplicationService::deleteCallHistoryById(bsonId);
+
+        return crow::response{204, "Call Deleted"};
+    });
+
+    app.port(5001).multithreaded().run();
 }
