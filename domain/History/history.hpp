@@ -7,16 +7,16 @@ using namespace std;
 class History {
 public:
     History() = default;
-    History(string id, string dialedName, string dialedSurname, string callerPhoneNumber, string dialedNumber, string date = ""):
+    History(string id, string dialedName, string dialedSurname, string callerPhoneNumber, string dialedNumber, const std::chrono::system_clock::time_point date):
             dialedId(move(id)), dialedName(std::move(dialedName)), dialedSurname(std::move(dialedSurname)),
-            callerPhoneNumber(std::move(callerPhoneNumber)), dialedNumber(move(dialedNumber)), date(std::move(date)) {}
+            callerPhoneNumber(std::move(callerPhoneNumber)), dialedNumber(move(dialedNumber)), date(date) {}
 
     string dialedId;
     string dialedName;
     string dialedSurname;
     string callerPhoneNumber;
     string dialedNumber;
-    string date;
+    std::chrono::system_clock::time_point date;
 };
 
 #endif //HISTORY_HPP

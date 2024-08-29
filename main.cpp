@@ -5,6 +5,12 @@
 #include <crow.h>
 #include <string>
 
+#include <valijson/schema.hpp>
+#include <valijson/schema_parser.hpp>
+#include <valijson/validator.hpp>
+#include <valijson/adapters/rapidjson_adapter.hpp>
+
+
 using namespace std;
 
 int main() {
@@ -129,7 +135,7 @@ int main() {
 
         History history{
             contact.id.to_string(), contact.name, contact.surname, callerNumber,
-            contact.phoneNumber
+            contact.phoneNumber, chrono::system_clock::now()
         };
 
         ContactApplicationService::makeCall(history);
@@ -139,34 +145,27 @@ int main() {
 
     // --- Arama Geçmişi Listeleme ---
     CROW_ROUTE(app, "/histories").methods(crow::HTTPMethod::Post)([](const crow::request &req) {
-        // Gelen POST isteğinden JSON verisini yükle
         const auto value = crow::json::load(req.body);
-
-        // Eğer JSON verisi geçersizse, 400 Bad Request yanıtı döndür
         if (!value) {
             return crow::response{400, "Bad Request!"};
         }
 
-        // JSON'dan telefon numarasını al
         const std::string phoneNumber = value["phoneNumber"].s();
         std::vector<crow::json::wvalue> historyList;
 
-        // Telefon numarasına göre çağrı geçmişini al ve JSON formatına dönüştür
         for (const auto &history: ContactApplicationService::getCallHistoryByPhoneNumber(phoneNumber)) {
             historyList.emplace_back(
                 crow::json::wvalue{
                 {"callerName", history.callerName},
                 {"callerSurname", history.callerSurname},
                 {"dialedNumber", history.dialedNumber},
-                {"date", history.date}
+                {"date", history.date.time_since_epoch().count()}
             });
         }
 
-        // Yanıt JSON'ını oluştur
         crow::json::wvalue response;
         response["CallHistory"] = std::move(historyList);
 
-        // Yanıtı döndür
         return crow::response{response};
     });
 

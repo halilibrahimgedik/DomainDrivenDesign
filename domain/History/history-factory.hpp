@@ -13,20 +13,6 @@ using bsoncxx::builder::basic::make_document;
 namespace HistoryFactory {
     using Document = bsoncxx::builder::basic::document;
 
-    inline string getTime() {
-        // 1. Şu anki zamanı al
-        const auto now = std::chrono::system_clock::now();
-
-        // 2. Zamanı std::time_t türüne dönüştür
-        const auto time = std::chrono::system_clock::to_time_t(now);
-
-        // 3. Zamanı formatla
-        stringstream ss;
-        ss << std::put_time(std::localtime(&time), "%Y-%m-%d %H:%M:%S");
-
-        return ss.str();
-    }
-
     Document inline addCallHistory(const History& history) {
         Document filter{};
         filter.append(
@@ -35,7 +21,7 @@ namespace HistoryFactory {
             kvp("dialedSurname", history.dialedSurname),
             kvp("callerPhoneNumber", history.callerPhoneNumber),
             kvp("dialedPhoneNumber", history.dialedNumber),
-            kvp("date", getTime())
+            kvp("date", bsoncxx::types::b_date{std::chrono::system_clock::now()})
         );
 
         return filter;
@@ -50,7 +36,7 @@ namespace HistoryFactory {
             history.dialedSurname = document["dialedSurname"].get_string().value;
             history.dialedNumber = document["dialedPhoneNumber"].get_string().value;
             history.callerPhoneNumber = document["callerPhoneNumber"].get_string().value;
-            history.date = document["date"].get_string().value;
+            history.date = document["date"].get_date();
             historyList.push_back(history);
         }
 
